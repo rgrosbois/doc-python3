@@ -394,9 +394,97 @@ carres = [x**2 for x in range(10)] # boucle for
 
 ### 2.4.2. P-uplet (tuple)
 
+C'est une liste non modifiable d'éléments qui peuvent être de types différents.
+
+```python
+mon_tuple = tuple() # vide
+mon_tuple = () # vide
+mon_tuple = { "bonjour", 46, 3.14, "demain" }
+tuple2 = 1., .5, .25, .125 # parenthèses non obligatoires
+tuple3 = (1,) # ne pas oublier la virgule si 1 seul élément
+tuple4 = tuple2 + tuple3 # concaténation
+```
+
+Utilisation de tuples:
+
+```python
+x, y, z = 1, 2, 4 # assignations multiples
+data[1], data[2] = data[2], data[1] # permutation
+```
+
+> Le module `collections` permet de définir des p-uplets nommés (`namedtuple`):
+> 
+> ```python
+> from collections import namedtuple
+> Personne = namedtuple('Personne', ['nom', 'prenom', 'jour', 'mois', 'annee'])
+> 
+> p = Personne('Paul', 'Dupont', 3, 'mars', 1980)
+> print('Mon nom est {} {}, je suis né le {} {} {}'.format(p.nom, p.prenom, p.jour, p.mois. p,annee))
+> ```
+> 
+> Ce type construit de données permet d'éviter la création d'une classe qui n'aurait pas de méthode.
+
 ### 2.4.3. Tableau
 
+Le type `array` permet de stocker des éléments du même type (spécifié lors de la création). C'est un *enrobage* autour du type tableau bas niveau (ex: en *C*). 
+
+Il est cependant préférable d'utiliser le type `list` lorsque possible (le module `array` n'est d'ailleurs pas chargé par défaut).
+
+```python
+import array
+
+a = array.array('B', [1, 2, 3, 4]) # B: unsigned int
+```
+
 ### 2.4.4. Séquence d'octets
+
+Elles sont principalement utilisées lors de communications (liaisons série, Bluetooth...)
+
+`bytes`: séquence d'entiers sous la forme d'octets non signés et immuables. L'exemple typique est une suite de caractères ASCII. Ils s'utilisent quasiment comme des chaînes de caractères (préfixées de `b`)
+
+2 principaux types:
+
+```python
+a = b'12' # 2 octets '1' (=49) et '2'(=50)
+a = b'\x0f\x12' # 2 octets: 15 et 18
+a = bytes(10) # 10 octets à 0
+a = bytes(range(20)) # 20 octets valeurs allant de 0 à 19
+```
+
+Conversions:
+
+- entre séquence et entiers:
+
+```python
+a = bytes([12]) # 1 entier vers 1 octet
+a = bytes([46, 46, 46]) # 3 entiers vers 3 octets
+a[0] # octet vers entier (valeur du premier élément)
+[b for b in a] # liste d'entiers
+```
+
+- entre une séquence d'octets et chaîne de caractères:
+
+```python
+bytes("Coucou", 'ascii') # ou 'utf-8'
+b'Coucou'.decode('ascii') # ou 'utf-8'
+```
+
+- entre séquence d'octets et représentation en chaîne hexadécimale:
+
+```python
+a = bytes.fromhex('0F 1206') # 3 octets (espaces non pris en compte)
+hex(a[0]) # séquence vers chaîne
+{:02x}.format(a[0])
+```
+
+`bytearray`: version modifiable des `bytes`. N'est utilisable qu'après une initialisation avec un constructeur et ne peut contenir que des entiers compris entre 0 et 255.
+
+```python
+a = bytearray()
+a = bytearray(10) # 10 octets initialisés à 0
+a = bytearray(range(20))
+a = bytearray(b'Hi!')
+```
 
 ## 2.5. Set
 
@@ -485,3 +573,224 @@ for v in mon_dict.values():
 ```
 
 > Attention: l'ordre d'affichage n'est pas nécessairement celui d'entrée.
+
+## 2.7. Exécution conditionnelle
+
+La structure if/elif/else:
+
+```python
+if a<=0:
+  print('a est négatif')
+elif a==0:
+  print('a est nul')
+else:
+  print('a est positif')
+```
+
+> Bien que déconseillé, il est possible de placer une unique instruction après le caractère `: ` (sans aller à la ligne)
+> 
+> ```python
+> if a<=0: print('a est négatif')
+> elif a==0: print('a est nul')
+> else: print('a est positif')
+> ```
+
+## 2.8. Boucle
+
+Boucle while:
+
+```python
+while True:
+  pass
+```
+
+Boucle for:
+
+```python
+for i in range(100): # 0, 1, ..., 99
+  print(i)
+```
+
+ou
+
+```python
+for i in range(2,8): # 2, 3, ..., 7
+  print(i)
+```
+
+ou
+
+```python
+for i in range(2,8,3): # 2, 5, 8
+  print(i)
+```
+
+Les deux mots-clé `continue` et `break` permettent respectivement de passer directement à l'itération suivante et de sortir de la boucle.
+
+> Ces 2 types de boucles peuvent être suivis d'une structure `else` qui est toujours exécutée, que la boucle ait itéré ou non:
+> 
+> ```python
+> i=1
+> while i<5:
+>   print(i, end=' ')
+>   i+=1
+> else:
+>   print("else", i)
+> # 1 2 3 4 "else" 5
+> ```
+> 
+> ou
+> 
+> ```python
+> for i in range(5):
+>   print(i, end=' ')
+> else:
+>   print("else", i)
+> # 0 1 2 3 4 "else" 4
+> ```
+
+> Attention: Il faut nécessairement une instruction après un `if`, `while` et `for`. Dans le cas contraire, il suffit d'utiliser l'instruction `pass`.
+
+## 2.9. Fonction
+
+Elle sert dans les cas suivants:
+
+- pour factoriser: si un fragment de code apparaît plus d'une fois à plusieurs endroits du programme.
+
+- pour segmenter: si une portion de code devient trop grande à lire ou comprendre.
+
+- pour la collaborer: si le développement du code doit être réparti entre plusieurs programmeurs.
+
+La déclaration se fait avec le mot-clé `def` (i.e. *define*):
+
+```python
+def mhello():
+  print('hello')
+
+def somme(a, b, c):
+  print(a, '+', b, '+', c, '=', str(a+b+c))
+```
+
+> Attention: il n'est pas possible d'appeler une fonction avant qu'apparaisse sa déclaration.
+
+Fonctions qui s'appliquent sur d'autres fonctions:
+
+- `map()`:  prend une fonction et ses entrées et retourne un itérateur contenant les résultats de la fonction appliquées aux entrées.
+
+```python
+m = map(lambda x:x**2, [1, 2, 3, 4]) # fonction classique ou lambda
+print(list(m))
+```
+
+- `filter()`: prend une fonction et ses entrées et retourne un itérateur contenant uniquement les entrées pour lesquelles la fonction a retourné `True` :
+
+```python
+f = filter(lambda x:x%2==0, [1, 2, 3, 4]) # fonction classique ou lambda
+print(list(f))
+```
+
+### 2.9.1. Fonctions prédéfinies
+
+Certaines fonctions sont directement définies dans le langage:
+
+- `print`
+
+- `del`
+
+- `type`
+
+- `len`
+
+### 2.9.2. Argument
+
+Lors de l'invocation, les arguments (paramètres) peuvent être de type:
+
+- positionnels (dans le même ordre que dans la déclaration):
+
+```python
+somme(2,4,6)
+```
+
+- mot-clés (ordre arbitraire):
+
+```python
+somme(c=6, b=4, a=2)
+```
+
+>  Les deux types ne peuvent être mixés que si l'on commence avec la forme positionnelle.
+> 
+> ```python
+> somme(2, c=6, b=4) # a=2
+> ```
+
+Il est aussi possible de spécifier des valeurs par défaut pour certains paramètres lors de la déclaration:
+
+```python
+def presentation(prenom, nom="Dupont"):
+  print("Bonjour, je m'appelle,", prenom, nom, ".")
+```
+
+### 2.9.3. Valeur de retour
+
+L'instruction `return` seule est optionnelle et permet de terminer (prématurément) une fonction sans aucune valeur de retour. Si l'on tente de récupérer la valeur de retour, on obtient `None`
+
+### 2.9.4. Lambda fonction
+
+C'est une fonction anonyme (même s'il est possible de la mémoriser dans une variable) qui se déclare avec le mot-clé `lambda`:
+
+```python
+two = lambda : 2 # pas d'argument, retourne 2
+sqr = lambda x : x*x # 1 argument
+pwr = lambda x,y : x**y # 2 arguments
+
+for i in range(-2, 3):
+  print(sqr(i), pwr(i, two()))
+```
+
+## 2.10. Itérateur/générateur
+
+Un itérateur doit fournir deux méthodes `__iter__` (retourne l'objet lui-même, appelé une fois à l'initialisation) et `__next__()` (appelé à chaque itération, retourne `StopIteration` si plus aucune valeur).
+
+Un exemple de générateur est la plage de nombres `range` (elle est appelée plusieurs fois en fournissant en valeur différente à chaque fois puis finit par signaler la fin de la série):
+
+```python
+range(1, 10, 2) # chiffres impairs de 1 à 9
+```
+
+Pour construire un générateur, on peut utiliser:
+
+- l'instruction `yield` qui est l'équivalent de `return` dans une fonction qui conserve l'état courant (les variables gardent leurs valeurs jusqu'à l'appel suivant)
+
+```python
+def powersOf2(n):
+  pow = 1
+  for i in range(n):
+    yield pow
+    pow *= 2
+```
+
+- avec une syntaxe semblable à une compréhension de liste:
+
+```python
+genr = (1 if x%2==0 else 0 for x in range(10))
+```
+
+Un générateur s'utilise:
+
+- dans le contexte d'une boucle `for` (avec l'opérateur `in`):
+
+```python
+for v in powersOf2(8):
+  print(v)
+for v in genr: # ou directement for v in (1 if x%2...)
+  print(v)
+```
+
+- dans une compréhension de liste ou converti en liste à l'aide de la fonction `list()`:
+
+```python
+t = [x for x in powersOf2(5)]
+t2 = list(powersOf2(5))
+```
+
+> Attention: contrairement à une fonction, un générateur ne peut pas être appelé directement.fig
