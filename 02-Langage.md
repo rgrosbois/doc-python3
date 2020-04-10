@@ -1,5 +1,7 @@
 # Chapitre 2. Langage
 
+[toc]
+
 Cf. [documentation en ligne](https://docs.python.org/3.7/contents.html)
 
 > Les commentaires dans les programmes débutent avec le caractère # et s'étendent jusqu'à la fin de la ligne.
@@ -15,7 +17,7 @@ type(3.2)
 type("a") # ou type('a')
 ```
 
-## 2.1 Littéral
+## 2.1 Valeur littérale
 
 ### 2.1.1 Nombre
 
@@ -793,4 +795,382 @@ t = [x for x in powersOf2(5)]
 t2 = list(powersOf2(5))
 ```
 
-> Attention: contrairement à une fonction, un générateur ne peut pas être appelé directement.fig
+> Attention: contrairement à une fonction, un générateur ne peut pas être appelé directement.
+
+## 2.11. Module
+
+C'est un fichier qui contient du code Python et qui peut être importé depuis un autre. On peut y trouver des variables, fonctions et classes.
+
+> La variable `__name__` permet de savoir si le module est exécuté directement (`__name__=='__main__'`) ou s'il est importé depuis un autre (`__name__=='__nomdumodule__'`)
+> 
+> ```python
+> if __name__ == '__main__':
+>   # code à n'exécuter que si
+>   # le module est utilisé directement
+>   # (i.e. non importé depuis un autre)
+> ```
+
+Contenu:
+
+- la première ligne du module débute par un *shebang*:
+
+```python
+#!/usr/bin/env python3
+```
+
+- Ensuite on retrouve la *docstring* (chaîne pouvant être multiligne):
+
+```python
+""" description du module """
+```
+
+> Cette documentation peut être consultée à l'aide de la variable `__doc__`:
+> 
+> ```python
+> import monmodule
+> 
+> print(monmodule.__doc__)
+> ```
+> 
+> ou depuis la console Python:
+> 
+> ```python
+> >>> help(monmodule)
+> ```
+
+L'initialisation d'un module correspond aux ligne d'instruction en dehors des déclarations de fonctions et classes. Elle ne s'effectue que la première fois que le module est utilisé.
+
+Il n'existe pas de moyen de cacher des variables ou fonctions internes mais, par convention, ces dernières sont considérées comme privées lorsque préfixées par `_` ou `__`.
+
+```python
+__ma_variable_privee = 5
+def __ma_fonction_privee():
+  pass
+```
+
+La liste des répertoires (modifiable) dans lequel Python recherche un module est donnée par la variable `path` (module `sys`):
+
+```python
+from sys import path
+
+path.append('../modules')
+```
+
+La recherche s'arrête dès qu'un premier module avec le nom correspondant est trouvé. Il existe 2 façons d'importer un module:
+
+- **Méthode 1**: l'espace de noms importé reste distinct du courant
+
+```python
+import math # module math (=espace de noms)
+
+print(math.sin(math.pi/2)) # méthode et variable de l'espace de noms math
+```
+
+> Il est possible de renommer l'espace de noms importé (=alias, le nom du module original n'est alors plus utilisable):
+> 
+> ```python
+> import math as M # M devient le nouvel espace de nom
+> 
+> print(M.sin(M.pi/2))
+> ```
+
+- **Méthode 2:** fusion de certaines parties dans l'espace de noms courant (la dernière redéfinition l'emporte)
+
+```python
+from math import sin,pi
+
+print(sin(pi/2))
+```
+
+> Il est possible de renommer les parties importées:
+> 
+> ```python
+> from math import pi as PI, sin as sine
+> ```
+
+> Attention: même si ce n'est pas conseillé, il est possible d'importer le contenu de tout un module dans l'espace de noms courant:
+> 
+> ```python
+> from math import *
+> ```
+
+Pour lister le contenu d'un module (ordre alphabétique):
+
+```python
+import math
+
+liste = dir(math) # fournit une liste
+print(liste)
+```
+
+## 2.12. Package
+
+C'est un container (module qui contient des sous-modules) qui s'apparente souvent à un répertoire qui contient:
+
+- obligatoirement un fichier d'initialisation (parfois vide): `__init__.py`,
+
+- 0, 1 ou plusieurs modules,
+
+- 0, 1 ou plusieurs sous-packages.
+
+> Pour gagner de la place, il est possible de compresser un package en un fichier *zip*: 
+> 
+> ```python
+> from sys import path
+> 
+> path.append('../monpackage.zip')
+> ```
+> 
+> Le package s'utilise de la même manière que s'il n'était pas compressé.
+
+## 2.13. Exception
+
+Elle est *levée* lorsque Python ne sait pas quoi faire avec un code: le programme s'arrête en affichant un message, sauf si cette dernière est gérée.
+
+Les exceptions sont hiérarchiques et possèdent un nom (63 prédéfinis dans python 3): `BaseException` (racine), `Exception` (erreur dans le code), `ImportError`, `ValueError`, `KeyboardInterrupt` (<kbd>Ctrl</kbd> + <kbd>c</kbd>), `ArithmeticError`, `OverflowError` (nombre trop grand), `ZeroDivisionError`, `AssertionError` (assertion qui échoue), `LookupError` (référence à une collection invalide), `MemoryError` (manque de RAM), `KeyError` (accès à un élément de collection inexistant), `IndexError` (accès à un élément de séquence non existant)...
+
+Pour gérer une exception:
+
+- Méthode simple (groupée):
+
+```python
+try:
+  # Instruction pouvant
+  # lever une exception
+except:
+  # Instruction en cas d'exception
+```
+
+- Méthode détaillée:
+
+```python
+try:
+  # Instruction pouvant
+  # lever une exception
+except ZeroDivisionError:
+  # Instruction en cas d'exception 1
+except ValueError:
+  # Instruction en cas d'exception 2
+except:
+  # pour les autres exceptions
+```
+
+> Les différentes exceptions sont évaluées dans l'ordre où elles sont écrites (attention à la hiérarchie): il faut commencer par les exceptions les plus précises et terminer par les plus générales.
+
+- Méthode combinée:
+
+```python
+try:
+  # Instruction pouvant
+  # lever une exception
+except (IndexError, ValueError):
+  # Instruction en cas d'exception
+```
+
+Il est possible d'ajouter 2 branchements supplémentaires qui sont exécutés respectivement si aucune exception n'est levée et dans tous les cas:
+
+```python
+try:
+  # code pouvant lever une exception
+except:
+  # si exception levée
+else:
+  # si aucune exception
+finally:
+  # dans tous les cas
+```
+
+Pour lever manuellement une exception:
+
+```python
+raise ZeroDivisionError # n'importe où dans le code
+raise # uniquement dans un except (relève la même exception)
+```
+
+Une assertion peut aussi lever une exception (`AssertionError`) en cas d'erreur:
+
+```python
+assert x>=0.0
+```
+
+Les exceptions sont, elles-mêmes, des classes:
+
+- pour obtenir plus d'information sur une exception:
+
+```python
+try:
+  # code pouvant lever une exception
+except Exception as e:
+  print(e)
+  print(e.__str__())
+```
+
+- il est possible de créer une sous-classe d'une exception existante:
+
+```python
+class PizzaError(Exception):
+  def __init__(self, pizza='Unknown', message=''):
+    Exception.__init__(self,message)
+    self.pizza = pizza
+
+class TooMuchCheeseError(PizzaError):
+  def __init__(self, pizza='Unknown', cheese='>100', message=''):
+    PizzaError.__init__(self, pizza, message)
+    self.cheese = cheese
+
+def makePizza(pizza, cheese):
+  if pizza not in ['margherita', 'capricciosa', 'calzone']:
+    raise PizzaError
+  if cheese > 100:
+    raise TooMuchCheeseError
+  print("Pizza ready !")
+
+try:
+  makePizza('margherita', 110)
+except TooMuchCheeseError as tmce:
+  print(tmce, ':', tmce.cheese)
+except PizzaError as pe:
+  print(pe, ':', pe.pizza)
+```
+
+## 2.14. Classe
+
+Instanciation d'un objet:
+
+```python
+mon_objet = MaClasse()
+```
+
+Pour savoir si un objet est une instance d'une certaine classe:
+
+```python
+isinstance(obj, classe)
+```
+
+Pour savoir si 2 objets sont les mêmes (i.e. référencent vers le même emplacement mémoire):
+
+```python
+objet1 is objet2
+```
+
+Création de la classe:
+
+- Le constructeur s'appelle `__init__`,
+
+- Le paramètre `self` correspond à l'objet en cours de création.
+
+- Les variables de classe se créée nécessairement en dehors de toute méthode. Elles existent même si aucun objet n'a été instancié.
+  Pour obtenir une liste des variables de classe:
+  
+  ```python
+  print(MaClasse.__dict__)
+  ```
+
+- Les propriétés de type *variable d'instance* se créée à tout moment (de préférence dans le constructeur) en utilisant `self`.
+  
+  > 2 objets d'une même classe peuvent avoir des propriétés différentes (une `AttributeError` est levée si on essaye d'accéder à une variable d'instance qui n'existe pas).
+  > La liste des propriétés d'un objet peut s'obtenir en consultant le dictionnaire `__dict__`:
+  > 
+  > ```python
+  > print(monobj.__dict__)
+  > ```
+
+- L'encapsulation peut s'obtenir en préfixant le nom d'une propriété ou d'une méthode par `__` (*mangling*).
+  
+  > Une telle propriété ou méthode n'est pas réellement privée: python l'a seulement renommée automatiquement sous la forme `_Class__maPropriete`.
+
+- Le constructeur et les méthodes ont nécessairement un premier paramètre qui se nomme (de préférence) `self`.
+
+- La méthode qui est invoquée lorsqu'on utilise un objet comme paramètre de la fonction `print` s'appelle `__str__`.
+
+```python
+class MaClasse():
+  """Documentation de la classe, accessible via MaClasse.__doc__ """
+
+  Counter = 0 # variable de classe
+
+  def __init__(self): # constructeur
+    self.__stk = [] # propriété (variable d'instance)
+    Class.Counter += 1
+
+  def pop(self, val): # méthode publique
+    self.__stk.append(val)
+
+  def __str__(self): # utilisée par print
+    return str(self.__stk)
+```
+
+Pour créer une sous-classe de `MaClasse`:
+
+```python
+class MaSousClasse(MaClasse):
+  def __init__(self):
+    MaClasse.__init__(self) # appeler le constructeur sur-classe
+    # variante super().__init__()
+
+    self.__sum = 0 # nouvelle propriété
+```
+
+> Il est possible d'hériter de plusieurs classes à la fois (mais cela reste généralement déconseillé):
+> 
+> ```python
+> class SubClass(Class1, Class2)
+> ```
+> 
+> `Class1` est prioritaire sur `Class2` en cas de propriété identique
+
+Pour savoir si une classe hérite d'une autre:
+
+```python
+issubclass(Class1, Class2) # Class1 hérite de Class2 ?
+```
+
+> Note: toute classe est considérée comme sous-classe d'elle-même.
+
+Certaines variantes de classes prédéfinies contiennent les informations suivantes:
+
+- `__name__`: chaîne de caractères contenant le nom de la classe.
+
+```python
+print(MaClass.__name__)
+print(type(mon_objet).__name__)
+```
+
+- `__module__`: chaîne de caractères contenant le nom du module qui contient la définition de la classe:
+
+```python
+print(MaClasse.__module__)
+print(type(mon_objet).__module__)
+```
+
+- `__doc__`: chaîne de caractères contenant la documentation de la classe
+
+```python
+print(MaClasse.__doc__)
+print(type(mon_obj).__doc__)
+```
+
+- Les super-classes d'une classe:
+
+```python
+for x in MaClasse.__bases__: # tuple
+  print(x.__name__)
+```
+
+Pour:
+
+- savoir si une variable d'instance ou de classe existe:
+
+```python
+if hasattr(mon_obj, 'ma_propriete'):
+  print(mon_obj.ma_propriete)
+if hasattr(MaClasse, 'ma_propriete'):
+  print(MaClasse.ma_propriete)
+```
+
+- consulter/modifier une variable d'instance ou de classe (i.e. attribut):
+
+```python
+val = getattr(obj, name)
+setattr(obj, name, nouvelle_valeur)
+```
