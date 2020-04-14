@@ -279,72 +279,53 @@ ma_liste[6:9] # (sous-)liste avec éléments 6, 7 et 8
 ma_liste[1:10:2] # liste avec éléments 1, 3, 5, 7, 9
 ```
 
-Pour connaître la longueur d'une liste:
+La longueur de la liste:
 
 ```python
 l = len(ma_liste)
 ```
 
-Pour modifier la liste:
-
-- ajouter un élément à la fin:
+- Pour compléter la liste:
 
 ```python
-ma_liste.append(4)
+ma_liste.append(4) # ajouter un élément à la fin
+ma_liste.insert("bonjour", 4) # insérer en position 4 (décaler à droite)
+ma_liste.extend(liste2) # concaténer une liste à la fin
 ```
 
-- ajouter une liste à la fin d'une autre:
+- Pour vider la liste:
 
 ```python
-ma_liste.extend(liste2)
-```
-
-- extraire le dernier élément:
-
-```python
-element = ma_liste.pop()
-```
-
-- insérer un élément à une certaine position (en décalant les suivants):
-
-```python
-ma_liste.insert("bonjour", 4)
-```
-
-- pour supprimer un élément (et décaler les suivants vers le début):
-
-```python
-del ma_liste[1] # supprimer un seul élément
+element = ma_liste.pop() # extraire le dernier élément
+del ma_liste[1] # supprimer un seul élément (décaler à gauche)
 del ma_liste[1:3] # supprimer les éléments 1 et 2
+del ma_liste # supprimer la liste
 ```
 
-Opérations sur tous les éléments:
-
-- pour parcourir les éléments:
+- Parcourir les éléments:
 
 ```python
+# foreach
 for e in ma_liste:
   print(e)
-```
 
-- pour énumérer les éléments:
-
-```python
+# énumération
 for i, item in enumerate(ma_liste):
   print(i, item)
 ```
 
-- pour faire la somme de tous les éléments:
+- Somme de tous les éléments:
 
 ```python
 sum([1, 3, 5, 6]) # donne 15
 ```
 
-- pour vérifier la présent/absence d'un élément:
+- pour vérifier la présence/absence d'un élément:
 
 ```python
-5 in ma_liste
 5 not in ma_liste
+5 in ma_liste
+pos = ma_liste.index(5) # position 1ère occurrence
 ```
 
 - pour permuter 2 éléments:
@@ -353,7 +334,7 @@ sum([1, 3, 5, 6]) # donne 15
 ma_liste[0], ma_liste[4] = ma_liste[4], ma_liste[0]
 ```
 
-- pour copier une liste:
+- Copier une liste:
 
 ```python
 liste2 = liste1[:] # liste entière
@@ -362,7 +343,7 @@ liste2 = liste1[:7] # éléments 0 à 6
 liste2 = liste1[7:] # éléments à partir de 7
 ```
 
-- pour trier:
+- Trier:
 
 ```python
 ['omega', 'alpha', 'gamme'].sort() # tri dans la même liste
@@ -370,7 +351,7 @@ sorted(['omega', 'alpha', 'gamme']) # donne une nouvelle liste
 sorted(['omega', 'alpha', 'gamme'], reverse=True) # tri inversé
 ```
 
-- pour combiner 2 listes (en une liste de tuples):
+- Combiner 2 listes (en une liste de tuples):
 
 ```python
 liste1 = ['a', 'b', 'c']
@@ -379,13 +360,13 @@ z = zip(liste1, liste2) # création d'un générateur
 liste3 = liste(z) # donne [('a', 1), ('b', 2), ('c', 3)]
 ```
 
-    et pour les décombiner:
+- Décombiner:
 
 ```python
 l1, l2 = zip(*liste3)
 ```
 
-Compréhension de liste:
+- Compréhensions:
 
 ```python
 carres = [x**2 for x in range(10)] # boucle for
@@ -752,6 +733,15 @@ for i in range(-2, 3):
 ## 2.10. Itérateur/générateur
 
 Un itérateur doit fournir deux méthodes `__iter__` (retourne l'objet lui-même, appelé une fois à l'initialisation) et `__next__()` (appelé à chaque itération, retourne `StopIteration` si plus aucune valeur).
+
+Utilisation d'un iterateur:
+
+```python
+e = next(mon_iter) # 1 seul élément
+
+for e in mon_iter: # boucle sur tous les element
+  print(e)
+```
 
 Un exemple de générateur est la plage de nombres `range` (elle est appelée plusieurs fois en fournissant en valeur différente à chaque fois puis finit par signaler la fin de la série):
 
@@ -1173,4 +1163,134 @@ if hasattr(MaClasse, 'ma_propriete'):
 ```python
 val = getattr(obj, name)
 setattr(obj, name, nouvelle_valeur)
+```
+
+## 2.15. Gestion de la console
+
+### 2.15.1. Affichage avec print
+
+>  `print` est devenue une fonction depuis la version 3.0 de Python
+> 
+> ```python
+> print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
+> ```
+
+Exemples d'utilisation:
+
+```python
+print("x=", 2*2) # items séparés par espace, terminé par \n
+print("x=", 2*2, sep="", end=" ")
+```
+
+### 2.15.2. Acquisition
+
+Pour récupérer les données saisies par l'utilisateur dans la console:
+
+```python
+reponse = input()
+repons2 = input("Entrer la valeur: ")
+```
+
+## 2.16. Fichiers
+
+Python les considère comme des flux. 3 flux sont déjà ouverts par défaut (module `sys`):
+
+- `sys.stdin` : entrée standard,
+
+- `sys.stdout`:  sortie standard,
+
+- `sys.stderr`: sortie erreur standard.
+
+Modes d'ouverture:
+
+```python
+stream = open('file.txt', mode='r', encoding=None) # en lecture
+stream = open('file.txt', mode='w', encoding=None) # en écriture
+stream = open('file.txt', mode='a', encoding=None) # en ajout
+stream = open('file.txt', mode='r+', encoding=None) # en lecture et ajout
+stream = open('file.txt', mode='w+', encoding=None) # en écriture et ajout
+```
+
+- tous ces modes d'ouverture peuvent être suffixés par `'b'` ou `'t'` pour indiquer respectivement une ouverture en mode binaire ou texte (par défaut).
+
+- le paramètre de `encoding` peut aussi valoir `'utf-8'`...
+
+- le paramètre `newline` peut valoir `''` (fin de ligne universel), `'\n'`, `'\r\n'`...
+
+Fichier texte:
+
+- lecture:
+
+```python
+ch = stream.read(1) # 1 caractère, '' si fin
+content = stream.read() # tout le flux (attention à la taille)
+ligne = stream.readline() # 1 seule ligne
+lignes = stream.readlines() # liste avec toutes les lignes du fichier
+lignes = stream.readlines(20) # liste de 20 lignes
+```
+
+- écriture:
+
+```python
+stream.write(c) # 1 caractère
+stream.write(ligne+'\n')
+```
+
+> Pour écrire sur la sortie erreur:
+> 
+> ```python
+> import sys
+> 
+> sys.stderr.write("Message d'erreur")
+> ```
+
+- fermeture
+
+```python
+stream.close()
+```
+
+> Comme l'objet créé à l'ouverture est une instance de la classe `iterable` (lecture d'une ligne par itération), il est possible d'écrire les instructions suivantes:
+> 
+> ```python
+> from os import strerror
+> 
+> try:
+>   for line in open('file.txt', 'rt'): # fermeture auto à la fin
+>     print(line)
+> except IOError as exc:
+>   strerror(exc.errno)
+> ```
+
+Autre format avec fermeture automatique:
+
+```python
+with open('myfile.txt', 'r') as f:
+  file_data = f.read()
+```
+
+Fichier binaire: l'écriture (`'wb'`) et la lecture (`'rb'`) utilisent des `bytearray`:
+
+```python
+data = bytearray(10) # 10 octets
+... # modification des données
+stream.write(data)
+...
+stream.readinfo(data) # lecture (retourne le nombre d'octets lus)
+data2 = bytearray(stream.read()) # non modifiable, fichier entier
+data2 = bytearray(stream.read(5)) # non modifiable, 5 octets
+```
+
+Gestion des exceptions:
+
+```python
+from os import exc.strerror
+
+try:
+  # ouverture, fermeture
+  # et autres actions sur le fichier
+except IOError as exc:
+  # exc.errno = errno.ENOENT (fichier n'existe pas), 
+  # errno.EMFILE (trop de fichiers ouverts)...
+  strerror(exc.errno) # gestion adaptée de exc.errno
 ```
